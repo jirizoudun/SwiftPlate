@@ -316,7 +316,7 @@ func askForGitHubURL(destination: String) -> String? {
 }
 
 func askFortemplatePath(destination: String) -> String? {
-    let question = "🎁  Any Git URL where is the template project located?"
+    let question = "🎁  Any path where is the template project located?"
 
     return askForOptionalInfo(question: question, questionSuffix: "(Leave empty to use the default template)")
 }
