@@ -53,7 +53,7 @@ extension Process {
 
 extension String {
     var nonEmpty: String? {
-        guard characters.count > 0 else {
+        guard count > 0 else {
             return nil
         }
         
@@ -65,7 +65,7 @@ extension String {
             return self
         }
         
-        let startIndex = index(endIndex, offsetBy: -suffix.characters.count)
+        let startIndex = index(endIndex, offsetBy: -suffix.count)
         return replacingCharacters(in: startIndex..<endIndex, with: "")
     }
 }
@@ -100,6 +100,7 @@ struct Arguments {
     var authorName: String?
     var authorEmail: String?
     var githubURL: String?
+    var templatePath: String?
     var organizationName: String?
     var repositoryURL: URL?
     var forceEnabled: Bool = false
@@ -117,6 +118,8 @@ struct Arguments {
                 authorEmail = arguments.element(after: index)
             case "--url", "-u":
                 githubURL = arguments.element(after: index)
+            case "--template-url", "-t":
+                templatePath = arguments.element(after: index)
             case "--organization", "-o":
                 organizationName = arguments.element(after: index)
             case "--repo", "-r":
@@ -312,6 +315,12 @@ func askForGitHubURL(destination: String) -> String? {
     return askForOptionalInfo(question: question)
 }
 
+func askFortemplatePath(destination: String) -> String? {
+    let question = "🎁  Any Git URL where is the template project located?"
+
+    return askForOptionalInfo(question: question, questionSuffix: "(Leave empty to use the default template)")
+}
+
 func performCommand(description: String, command: () throws -> Void) rethrows {
     print("👉  \(description)...")
     try command()
@@ -328,6 +337,7 @@ let projectName = arguments.projectName ?? askForProjectName(destination: destin
 let authorName = arguments.authorName ?? askForAuthorName()
 let authorEmail = arguments.authorEmail ?? askForAuthorEmail()
 let gitHubURL = arguments.githubURL ?? askForGitHubURL(destination: destination)
+let templatePath = arguments.templatePath ?? askFortemplatePath(destination: destination)
 let organizationName = arguments.organizationName ?? askForOptionalInfo(question: "🏢  What's your organization name?")
 
 print("---------------------------------------------------------------------")
@@ -342,6 +352,12 @@ if let authorEmail = authorEmail {
 
 if let gitHubURL = gitHubURL {
     print("🌍  GitHub URL: \(gitHubURL)")
+}
+
+if let templatePath = templatePath {
+    print("🎁  Template path: \(templatePath)")
+} else {
+    print("🎁  Using default template")
 }
 
 if let organizationName = organizationName {
@@ -362,7 +378,7 @@ do {
     let fileManager = FileManager.default
     let temporaryDirectoryPath = destination + "/swiftplate_temp"
     let gitClonePath = "\(temporaryDirectoryPath)/SwiftPlate"
-    let templatePath = "\(gitClonePath)/Template"
+    let template = (templatePath?.count ?? 0) > 0 ? templatePath! : "\(gitClonePath)/Template"
     
     performCommand(description: "Removing any previous temporary folder") {
         try? fileManager.removeItem(atPath: temporaryDirectoryPath)
@@ -377,7 +393,7 @@ do {
         Process().launchBash(withCommand: "git clone \(repositoryURL.absoluteString) '\(gitClonePath)' -q")
     }
     
-    try performCommand(description: "Copying template folder") {
+    try performCommand(description: "Copying template folder (\(template))") {
         let ignorableItems: Set<String> = ["readme.md", "license"]
         let ignoredItems = try fileManager.contentsOfDirectory(atPath: destination).map {
             $0.lowercased()
@@ -385,8 +401,8 @@ do {
             ignorableItems.contains($0)
         }
 
-        for itemName in try fileManager.contentsOfDirectory(atPath: templatePath) {
-            let originPath = templatePath + "/" + itemName
+        for itemName in try fileManager.contentsOfDirectory(atPath: template) {
+            let originPath = template + "/" + itemName
             let destinationPath = destination + "/" + itemName
 
             let lowercasedItemName = itemName.lowercased()
