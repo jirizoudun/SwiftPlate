@@ -1,0 +1,16 @@
+//
+//  Multiplatform.xcconfig
+//  O2PlayerCore
+//
+//  Created by Jiří Zoudun on 10/01/2018.
+//  Copyright © 2018 Etnetera a.s. All rights reserved.
+//
+
+#include "Framework.xcconfig"
+
+SUPPORTED_PLATFORMS = macosx iphoneos iphonesimulator appletvsimulator appletvos watchos watchsimulator
+
+TARGETED_DEVICE_FAMILY = 1,2
+
+LD_RUNPATH_SEARCH_PATHS = @executable_path/Frameworks @loader_path/Frameworks $(inherited)
+LD_RUNPATH_SEARCH_PATHS[sdk=macosx*] = @executable_path/../Frameworks @loader_path/../Frameworks $(inherited)

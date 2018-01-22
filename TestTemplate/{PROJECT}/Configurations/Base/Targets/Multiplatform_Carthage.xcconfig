@@ -1,0 +1,16 @@
+//
+//  Multiplatform.xcconfig
+//  O2PlayerCore
+//
+//  Created by Jiří Zoudun on 10/01/2018.
+//  Copyright © 2018 Etnetera a.s. All rights reserved.
+//
+
+#include "Multiplatform.xcconfig"
+
+FRAMEWORK_SEARCH_PATHS[sdk=appletvos*] = $(SRCROOT)/Carthage/Build/tvOS
+FRAMEWORK_SEARCH_PATHS[sdk=appletvsimulator*] = $(SRCROOT)/Carthage/Build/tvOS
+FRAMEWORK_SEARCH_PATHS[sdk=iphoneos*] = $(SRCROOT)/Carthage/Build/iOS
+FRAMEWORK_SEARCH_PATHS[sdk=iphonesimulator*] = $(SRCROOT)/Carthage/Build/iOS
+FRAMEWORK_SEARCH_PATHS[sdk=macosx*] = $(SRCROOT)/Carthage/Build/Mac
+
